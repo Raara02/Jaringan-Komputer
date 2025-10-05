@@ -1,138 +1,198 @@
-Tutorial Install FreeRadius + DoloRadius di Ubuntu 24.
+# Tutorial Install FreeRadius + DaloRadius di Ubuntu 24
 
-// **1.	Perbarui Sistem**
-```sudo apt update && sudo apt -y upgrade```
+## 1. Perbarui Sistem
+```bash
+sudo apt update && sudo apt -y upgrade
+```
 
-2.	Instal Apache dan PHP
--	Install Apache dengan menjalankan
+---
+
+## 2. Instal Apache dan PHP
+
+### Install Apache
+```bash
 sudo apt -y install apache2
+```
 
--	Cek Status Apache
+Cek status Apache:
+```bash
 sudo systemctl status apache2
-Keterangan : pastikan sudah tertulis active (running)
- 
+```
+> Pastikan statusnya `active (running)`
 
--	Instalasi PHP di ubuntu
+### Instalasi PHP
+```bash
 sudo apt -y install vim php libapache2-mod-php php-{gd,common,mail,mail-mime,mysql,pear,db,mbstring,xml,curl,zip}
+```
 
--	Cek versi PHP
+Cek versi PHP:
+```bash
 php -v
-Keterangan : jika sudah terinstall maka akan muncul versi dari PHP
- 
+```
+> Pastikan versi PHP muncul sebagai tanda instalasi berhasil.
 
-3.	Instal MariaDB dan Buat database
--	Install database MariaDB
+---
+
+## 3. Instal MariaDB dan Buat Database
+
+### Instal MariaDB
+```bash
 sudo apt update && sudo apt install mariadb-server
+```
 
--	Cek status MariaDB
+Cek status MariaDB:
+```bash
 sudo systemctl status mariadb
-Keterangan : pastikan sudah tertulis active (running)
- 
--	Masuk ke MariaDb
-sudo mysql -u root -p
+```
+> Pastikan statusnya `active (running)`
 
--	Buat database :
+Masuk ke MariaDB:
+```bash
+sudo mysql -u root -p
+```
+
+Buat database:
+```sql
 CREATE DATABASE radius;
 GRANT ALL ON radius.* TO radius@localhost IDENTIFIED BY "Str0ngR@diusPass";
 FLUSH PRIVILEGES;
+```
 
--	Cek database sudah terinstall
+Cek database:
+```sql
 SHOW DATABASES;
-Keterangan : pastikan sudah ada database Bernama radius 
- 
+```
+> Pastikan ada database bernama `radius`.
 
-Keluar dari MariaDB :
-QUIT
+Keluar dari MariaDB:
+```sql
+QUIT;
+```
 
-4.	Instal dan Konfigurasi FreeRADIUS
--	Cek Versi freeradius yang tersedia diubuntu anda :
+---
+
+## 4. Instal dan Konfigurasi FreeRADIUS
+
+Cek versi FreeRADIUS yang tersedia:
+```bash
 sudo apt policy freeradius
+```
 
--	Install FreeRadius dari  repositori APT resmi Ubuntu
+Install FreeRADIUS:
+```bash
 sudo apt -y install freeradius freeradius-mysql freeradius-utils
+```
 
--	Cek apakah freeradius sudah terintall
+Cek versi:
+```bash
 freeradius -v
-Keterangan: jika sudah terintall maka akan muncul versi dari freeradius anda
- 
+```
 
--	Cek apakah database sudah terhubung dengan freeradius
+Cek apakah database sudah terhubung:
+```bash
 apt list --installed | grep freeradius
-Keterangan : jika muncul freeradius-mysql, maka sudah terhubung
- 
+```
+> Jika muncul `freeradius-mysql`, berarti sudah terhubung.
 
--	Download file schema.sql
+### Import Database Schema
+```bash
 cd ~
-wget https://raw.githubusercontent.com/FreeRADIUS/freeradius-server/v3.2.x/raddb/mods-config/sql/main/mysql/schema.sql 
-
--	Cek dan pastikan filenya ada
+wget https://raw.githubusercontent.com/FreeRADIUS/freeradius-server/v3.2.x/raddb/mods-config/sql/main/mysql/schema.sql
 ls -l schema.sql
+mysql -u radius -p radius < schema.sql
+```
+> Masukkan password `Str0ngR@diusPass` saat diminta.
 
--	Import schme.sql ke database radius
-mysql -u radius -p radius < schema.sql 
-Masukkan passwordnya yaitu : Str0ngR@diusPass
+---
 
-5.	Aktifkan modul SQL
--	Cek folder versi freeradius
+## 5. Aktifkan Modul SQL
+
+Cek versi folder FreeRADIUS:
+```bash
 sudo ls /etc/freeradius/
+```
 
--	Jika outputcodenya : 3.0, Maka ikuti perintah ini
+Jika output-nya `3.0`, jalankan:
+```bash
 sudo ln -s /etc/freeradius/3.0/mods-available/sql /etc/freeradius/3.0/mods-enabled/
-Keterangan : jika bukan 3.0, maka Ganti saja dengan folder versi freeradius anda misalkan 3.2
-6.	Konfigurasi Modul SQL
--	Edit file modul SQL
+```
+> Jika versinya berbeda (misal 3.2), sesuaikan angkanya.
+
+---
+
+## 6. Konfigurasi Modul SQL
+
+Edit file modul SQL:
+```bash
 sudo nano /etc/freeradius/3.0/mods-enabled/sql
+```
+> Pastikan konfigurasi `sql { ... }` dan pengaturan MySQL sudah sesuai kebutuhan.
 
--	Pastikan isi dibagian sql seperti ini
- 
+---
 
--	Lalu pastikan bagian mysql ini di komentar (#)
-  
+## 7. Atur Permission Modul SQL
+```bash
+sudo chgrp -h freerad /etc/freeradius/3.0/mods-available/sql
+sudo chown -R freerad:freerad /etc/freeradius/3.0/mods-enabled/sql
+```
 
-
-//7.	**Atur Permission modul SQL**
-```sudo chgrp -h freerad /etc/freeradius/3.0/mods-available/sql```
-```sudo chown -R freerad:freerad /etc/freeradius/3.0/mods-enabled/sql```
-
--	Restart FreeRADIUS & Cek statusnya
+Restart FreeRADIUS dan cek statusnya:
+```bash
 sudo systemctl restart freeradius
 sudo systemctl status freeradius
-Keterangan : Pastikan sudah active (running)
- 
+```
+> Pastikan `active (running)`.
 
--	Jika terjadi eror bisa cek melalui perintah ini
+Jika error, jalankan mode debug:
+```bash
 sudo freeradius -X
+```
 
-//8.	**Install & Konfigurasi daloRADIUS**
-//-	Install git dan clone repo
-```sudo apt -y install git```
-```git clone https://github.com/lirantal/daloradius.git```
+---
 
-//-	Import database schema daloRadius
-```cd daloradius```
-```sudo mysql -u radius -p radius < contrib/db/fr3-mariadb-freeradius.sql```
-```sudo mysql -u radius -p radius < contrib/db/mariadb-daloradius.sql```
+## 8. Install & Konfigurasi daloRADIUS
 
-//-	Pindahkan ke /var/www
-```sudo mv ~/daloradius /var/www/```
+### Install Git dan Clone Repo
+```bash
+sudo apt -y install git
+git clone https://github.com/lirantal/daloradius.git
+```
 
-//-	Masuk ke folder config
-```cd /var/www/daloradius/app/common/includes/```
-```sudo cp daloradius.conf.php.sample daloradius.conf.php```
-```sudo chown www-data:www-data daloradius.conf.php```
-```sudo nano daloradius.conf.php```
+### Import Database Schema daloRADIUS
+```bash
+cd daloradius
+sudo mysql -u radius -p radius < contrib/db/fr3-mariadb-freeradius.sql
+sudo mysql -u radius -p radius < contrib/db/mariadb-daloradius.sql
+```
 
--	Isi dan pastikan seperti ini
- 
+### Pindahkan ke Direktori Web
+```bash
+sudo mv ~/daloradius /var/www/
+```
 
-//-	Buat folder var & set permission
-```cd /var/www/daloradius/
+### Konfigurasi File
+```bash
+cd /var/www/daloradius/app/common/includes/
+sudo cp daloradius.conf.php.sample daloradius.conf.php
+sudo chown www-data:www-data daloradius.conf.php
+sudo nano daloradius.conf.php
+```
+> Pastikan konfigurasi database sesuai (nama DB, user, dan password).
+
+### Buat Folder Log & Set Permission
+```bash
+cd /var/www/daloradius/
 sudo mkdir -p var/{log,backup}
 sudo chown -R www-data:www-data var
+```
 
-//9.	Konfigurasi Apache
-//-	Buat port
-```sudo tee /etc/apache2/ports.conf<<EOF
+---
+
+## 9. Konfigurasi Apache
+
+### Tambah Port
+```bash
+sudo tee /etc/apache2/ports.conf <<EOF
 Listen 80
 Listen 8000
 
@@ -143,10 +203,12 @@ Listen 8000
 <IfModule mod_gnutls.c>
     Listen 443
 </IfModule>
-EOF```
+EOF
+```
 
-//**Buat virtual host untuk operator (port 8000)***
-```sudo tee /etc/apache2/sites-available/operators.conf<<EOF
+### Buat Virtual Host untuk Operator (Port 8000)
+```bash
+sudo tee /etc/apache2/sites-available/operators.conf <<EOF
 <VirtualHost *:8000>
     ServerAdmin operators@localhost
     DocumentRoot /var/www/daloradius/app/operators
@@ -164,10 +226,12 @@ EOF```
     ErrorLog \${APACHE_LOG_DIR}/daloradius/operators/error.log
     CustomLog \${APACHE_LOG_DIR}/daloradius/operators/access.log combined
 </VirtualHost>
-EOF```
+EOF
+```
 
-//-	Buat virtual host untuk user (port 80)
-```sudo tee /etc/apache2/sites-available/users.conf<<EOF
+### Buat Virtual Host untuk User (Port 80)
+```bash
+sudo tee /etc/apache2/sites-available/users.conf <<EOF
 <VirtualHost *:80>
     ServerAdmin users@localhost
     DocumentRoot /var/www/daloradius/app/users
@@ -185,23 +249,29 @@ EOF```
     ErrorLog \${APACHE_LOG_DIR}/daloradius/users/error.log
     CustomLog \${APACHE_LOG_DIR}/daloradius/users/access.log combined
 </VirtualHost>
-EOF```
+EOF
+```
 
-//10.	**Aktifkan Site & Restart Apache** 
-```sudo a2ensite users.conf operators.conf```
-```sudo mkdir -p /var/log/apache2/daloradius/{operators,users}```
-```sudo a2dissite 000-default.conf```
-```systemctl reload apache2```
-```sudo systemctl restart apache2 freeradius```
+---
 
-//11.	Tes Akses Web
-//Buka browser dan akses:
--	Panel operator/admin → http://<IP_SERVER>:8000/
--	Portal user → http://<IP_SERVER>/
+## 10. Aktifkan Site & Restart Apache
+```bash
+sudo a2ensite users.conf operators.conf
+sudo mkdir -p /var/log/apache2/daloradius/{operators,users}
+sudo a2dissite 000-default.conf
+sudo systemctl reload apache2
+sudo systemctl restart apache2 freeradius
+```
 
-Tampilan operator/admin akan seperti :
- 
-Isi dengan akun defaultnya :
--	Username: administrator
--	Password: radius
- 
+---
+
+## 11. Tes Akses Web
+
+Buka browser dan akses:
+
+- Panel Operator/Admin → `http://<IP_SERVER>:8000/`
+- Portal User → `http://<IP_SERVER>/`
+
+Akun default:
+- **Username:** administrator  
+- **Password:** radius
