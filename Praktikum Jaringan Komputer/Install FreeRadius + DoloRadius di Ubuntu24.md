@@ -130,8 +130,10 @@ Edit file modul SQL:
 ```bash
 sudo nano /etc/freeradius/3.0/mods-enabled/sql
 ```
-> Pastikan konfigurasi `sql { ... }` dan pengaturan MySQL sudah sesuai kebutuhan.
+![Sesuaikan seperti gambar berikut](images/konfigurasi-sql.png)
+![Sesuaikan seperti gambar berikut](images/komentar_sql.png)
 
+> Pastikan konfigurasi `sql { ... }` dan pengaturan MySQL sudah sesuai kebutuhan.
 ---
 
 ## 7. Atur Permission Modul SQL
@@ -197,6 +199,8 @@ sudo chown www-data:www-data daloradius.conf.php
 ```bash
 sudo nano daloradius.conf.php
 ```
+![Sesuaikan seperti gambar berikut](images/konfig_daloradius.png)
+
 > Pastikan konfigurasi database sesuai (nama DB, user, dan password).
 
 ### Buat Folder Log & Set Permission
@@ -307,3 +311,4 @@ Buka browser dan akses:
 Akun default:
 - **Username:** administrator  
 - **Password:** radius
+![Sesuaikan seperti gambar berikut](images/berhasil.png)
