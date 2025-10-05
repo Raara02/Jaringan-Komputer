@@ -98,7 +98,11 @@ apt list --installed | grep freeradius
 ```bash
 cd ~
 wget https://raw.githubusercontent.com/FreeRADIUS/freeradius-server/v3.2.x/raddb/mods-config/sql/main/mysql/schema.sql
+```
+```bash
 ls -l schema.sql
+```
+```bash
 mysql -u radius -p radius < schema.sql
 ```
 > Masukkan password `Str0ngR@diusPass` saat diminta.
@@ -133,12 +137,16 @@ sudo nano /etc/freeradius/3.0/mods-enabled/sql
 ## 7. Atur Permission Modul SQL
 ```bash
 sudo chgrp -h freerad /etc/freeradius/3.0/mods-available/sql
+```
+```bash
 sudo chown -R freerad:freerad /etc/freeradius/3.0/mods-enabled/sql
 ```
 
 Restart FreeRADIUS dan cek statusnya:
 ```bash
 sudo systemctl restart freeradius
+```
+```bash
 sudo systemctl status freeradius
 ```
 > Pastikan `active (running)`.
@@ -155,13 +163,19 @@ sudo freeradius -X
 ### Install Git dan Clone Repo
 ```bash
 sudo apt -y install git
+```
+```bash
 git clone https://github.com/lirantal/daloradius.git
 ```
 
 ### Import Database Schema daloRADIUS
 ```bash
 cd daloradius
+```
+```bash
 sudo mysql -u radius -p radius < contrib/db/fr3-mariadb-freeradius.sql
+```
+```bash
 sudo mysql -u radius -p radius < contrib/db/mariadb-daloradius.sql
 ```
 
@@ -173,8 +187,14 @@ sudo mv ~/daloradius /var/www/
 ### Konfigurasi File
 ```bash
 cd /var/www/daloradius/app/common/includes/
+```
+```bash
 sudo cp daloradius.conf.php.sample daloradius.conf.php
+```
+```bash
 sudo chown www-data:www-data daloradius.conf.php
+```
+```bash
 sudo nano daloradius.conf.php
 ```
 > Pastikan konfigurasi database sesuai (nama DB, user, dan password).
@@ -182,7 +202,11 @@ sudo nano daloradius.conf.php
 ### Buat Folder Log & Set Permission
 ```bash
 cd /var/www/daloradius/
+```
+```bash
 sudo mkdir -p var/{log,backup}
+```
+```bash
 sudo chown -R www-data:www-data var
 ```
 
@@ -257,9 +281,17 @@ EOF
 ## 10. Aktifkan Site & Restart Apache
 ```bash
 sudo a2ensite users.conf operators.conf
+```
+```bash
 sudo mkdir -p /var/log/apache2/daloradius/{operators,users}
+```
+```bash
 sudo a2dissite 000-default.conf
+```
+```bash
 sudo systemctl reload apache2
+```
+```bash
 sudo systemctl restart apache2 freeradius
 ```
 
