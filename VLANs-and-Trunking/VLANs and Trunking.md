@@ -7,8 +7,6 @@ Pengembangan dilakukan dengan menambahkan **satu switch baru (S3)** dan **satu V
 ---
 
 ## 🖥️ Topologi Jaringan
-![Network Topology](A_2D_digital_network_diagram_illustrates_VLANs_(Vi.png)
-
 **Daftar Perangkat:**
 - Switch: `S1`, `S2`, `S3`  
 - PC: `PC-A`, `PC-B`, `PC-C`  
