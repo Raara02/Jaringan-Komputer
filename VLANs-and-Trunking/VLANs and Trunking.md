@@ -94,3 +94,32 @@ interface f0/2
  switchport access vlan 30
 
 show vlan brief
+
+4️⃣ Konfigurasi VLAN Management
+
+VLAN 99 digunakan untuk manajemen switch. Hapus IP dari VLAN 1 dan pindahkan ke VLAN 99.
+
+interface vlan 1
+ no ip address
+interface vlan 99
+ ip address 192.168.1.11 255.255.255.0
+ no shutdown
+exit
+
+5️⃣ Konfigurasi Trunk Antar Switch
+
+Gunakan port FastEthernet0/1 untuk trunk antar switch.
+
+interface f0/1
+ switchport mode trunk
+ switchport trunk native vlan 1000
+
+
+Lakukan pada S1 ↔ S2 dan S2 ↔ S3.
+
+6️⃣ Verifikasi VLAN dan Trunk
+
+Gunakan perintah berikut untuk memastikan konfigurasi VLAN dan trunk sudah benar:
+
+show vlan brief
+show interfaces trunk
