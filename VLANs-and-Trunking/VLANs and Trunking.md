@@ -1,6 +1,3 @@
-
-
-````markdown
 # 🌐 Konfigurasi VLAN dan Trunking (Pengembangan Topologi)
 
 ## 🧩 Deskripsi
@@ -56,9 +53,7 @@ interface vlan 1
  no shutdown
 exit
 copy running-config startup-config
-````
 
-> 💡 Ubah IP address sesuai tabel untuk S2 dan S3.
 
 ---
 
