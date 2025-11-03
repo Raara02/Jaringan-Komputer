@@ -51,3 +51,46 @@ interface vlan 1
  no shutdown
 exit
 copy running-config startup-config
+
+---
+
+## 2️⃣ Membuat VLAN
+Gunakan perintah berikut untuk membuat VLAN di setiap switch.
+
+```bash
+vlan 10
+ name Operations
+vlan 20
+ name Parking_Lot
+vlan 30
+ name Finance
+vlan 99
+ name Management
+vlan 1000
+ name Native
+
+---
+
+## 3️⃣ Menghubungkan Port ke VLAN
+
+Setiap PC dihubungkan ke port switch yang sesuai dengan VLAN-nya.
+
+---
+
+### 🟦 S1 (PC-A - VLAN 10)
+```bash
+interface f0/6
+ switchport mode access
+ switchport access vlan 10
+
+! Konfigurasi untuk S2
+interface f0/18
+ switchport mode access
+ switchport access vlan 10
+
+! Konfigurasi untuk S3
+interface f0/2
+ switchport mode access
+ switchport access vlan 30
+
+show vlan brief
