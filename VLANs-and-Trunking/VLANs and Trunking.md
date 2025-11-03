@@ -53,7 +53,7 @@ interface vlan 1
  no shutdown
 exit
 copy running-config startup-config
-
+```
 
 ---
 
@@ -110,18 +110,6 @@ Verifikasi dengan:
 show vlan brief
 ```
 
-Contoh output:
-
-```
-VLAN Name                             Status    Ports
----- -------------------------------- --------- -------------------------------
-1    default                          active    Fa0/3, Fa0/4
-10   Operations                       active    Fa0/6, Fa0/18
-30   Finance                          active    Fa0/2
-99   Management                       active    VLAN Interface
-1000 Native                           active
-```
-
 ---
 
 ### 4️⃣ Konfigurasi VLAN Management
@@ -162,33 +150,6 @@ Gunakan perintah berikut untuk memastikan konfigurasi VLAN dan trunk sudah benar
 ```bash
 show vlan brief
 show interfaces trunk
-```
-
-#### Contoh Output
-
-**`show vlan brief`**
-
-```
-VLAN Name                             Status    Ports
----- -------------------------------- --------- -------------------------------
-1    default                          active    Fa0/3, Fa0/4, Gi0/1
-10   Operations                       active    Fa0/6, Fa0/18
-30   Finance                          active    Fa0/2
-99   Management                       active    VLAN Interface
-1000 Native                           active
-```
-
-**`show interfaces trunk`**
-
-```
-Port        Mode         Encapsulation  Status        Native vlan
-Fa0/1       trunk        802.1q         trunking      1000
-
-Port        Vlans allowed on trunk
-Fa0/1       1-1005
-
-Port        Vlans allowed and active in management domain
-Fa0/1       10,30,99,1000
 ```
 
 ---
