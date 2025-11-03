@@ -1,3 +1,6 @@
+
+
+````markdown
 # 🌐 Konfigurasi VLAN dan Trunking (Pengembangan Topologi)
 
 ## 🧩 Deskripsi
@@ -30,9 +33,11 @@ Pengembangan dilakukan dengan menambahkan **satu switch baru (S3)** dan **satu V
 
 ---
 
-## ⚙️ Langkah Konfigurasi
+## ⚙️ Tahapan Konfigurasi
 
 ### 1️⃣ Konfigurasi Dasar Switch
+Lakukan konfigurasi dasar di setiap switch:
+
 ```bash
 enable
 configure terminal
@@ -51,11 +56,15 @@ interface vlan 1
  no shutdown
 exit
 copy running-config startup-config
+````
+
+> 💡 Ubah IP address sesuai tabel untuk S2 dan S3.
 
 ---
 
-## 2️⃣ Membuat VLAN
-Gunakan perintah berikut untuk membuat VLAN di setiap switch.
+### 2️⃣ Membuat VLAN
+
+Gunakan perintah berikut di setiap switch untuk membuat VLAN.
 
 ```bash
 vlan 10
@@ -68,58 +77,165 @@ vlan 99
  name Management
 vlan 1000
  name Native
+```
 
 ---
 
-## 3️⃣ Menghubungkan Port ke VLAN
+### 3️⃣ Menghubungkan Port ke VLAN
 
 Setiap PC dihubungkan ke port switch yang sesuai dengan VLAN-nya.
 
----
+#### 🟦 S1 (PC-A - VLAN 10)
 
-### 🟦 S1 (PC-A - VLAN 10)
 ```bash
 interface f0/6
  switchport mode access
  switchport access vlan 10
+```
 
-! Konfigurasi untuk S2
+#### 🟩 S2 (PC-B - VLAN 10)
+
+```bash
 interface f0/18
  switchport mode access
  switchport access vlan 10
+```
 
-! Konfigurasi untuk S3
+#### 🟧 S3 (PC-C - VLAN 30)
+
+```bash
 interface f0/2
  switchport mode access
  switchport access vlan 30
+```
 
+Verifikasi dengan:
+
+```bash
 show vlan brief
+```
 
-4️⃣ Konfigurasi VLAN Management
+Contoh output:
+
+```
+VLAN Name                             Status    Ports
+---- -------------------------------- --------- -------------------------------
+1    default                          active    Fa0/3, Fa0/4
+10   Operations                       active    Fa0/6, Fa0/18
+30   Finance                          active    Fa0/2
+99   Management                       active    VLAN Interface
+1000 Native                           active
+```
+
+---
+
+### 4️⃣ Konfigurasi VLAN Management
 
 VLAN 99 digunakan untuk manajemen switch. Hapus IP dari VLAN 1 dan pindahkan ke VLAN 99.
 
+```bash
 interface vlan 1
  no ip address
 interface vlan 99
  ip address 192.168.1.11 255.255.255.0
  no shutdown
 exit
+```
 
-5️⃣ Konfigurasi Trunk Antar Switch
+> Gunakan IP yang berbeda di setiap switch (lihat tabel IP).
 
-Gunakan port FastEthernet0/1 untuk trunk antar switch.
+---
 
+### 5️⃣ Konfigurasi Trunk Antar Switch
+
+Gunakan port **FastEthernet0/1** untuk trunk antar switch.
+
+```bash
 interface f0/1
  switchport mode trunk
  switchport trunk native vlan 1000
-
+```
 
 Lakukan pada S1 ↔ S2 dan S2 ↔ S3.
 
-6️⃣ Verifikasi VLAN dan Trunk
+---
 
-Gunakan perintah berikut untuk memastikan konfigurasi VLAN dan trunk sudah benar:
+### 6️⃣ Verifikasi VLAN dan Trunk
 
+Gunakan perintah berikut untuk memastikan konfigurasi VLAN dan trunk sudah benar.
+
+```bash
 show vlan brief
 show interfaces trunk
+```
+
+#### Contoh Output
+
+**`show vlan brief`**
+
+```
+VLAN Name                             Status    Ports
+---- -------------------------------- --------- -------------------------------
+1    default                          active    Fa0/3, Fa0/4, Gi0/1
+10   Operations                       active    Fa0/6, Fa0/18
+30   Finance                          active    Fa0/2
+99   Management                       active    VLAN Interface
+1000 Native                           active
+```
+
+**`show interfaces trunk`**
+
+```
+Port        Mode         Encapsulation  Status        Native vlan
+Fa0/1       trunk        802.1q         trunking      1000
+
+Port        Vlans allowed on trunk
+Fa0/1       1-1005
+
+Port        Vlans allowed and active in management domain
+Fa0/1       10,30,99,1000
+```
+
+---
+
+### 7️⃣ Uji Konektivitas
+
+Lakukan pengujian konektivitas antar perangkat menggunakan perintah `ping`.
+
+| Pengujian       | Hasil | Keterangan                   |
+| :-------------- | :---- | :--------------------------- |
+| PC-A ↔ PC-B     | ✅     | VLAN 10 melewati trunk       |
+| PC-A ↔ PC-C     | ❌     | Berbeda VLAN                 |
+| S1 ↔ S2 ↔ S3    | ✅     | Trunk aktif                  |
+| Ping antar VLAN | ❌     | Tidak ada inter-VLAN routing |
+
+> ✅ Berhasil: perangkat berada dalam VLAN yang sama.
+> ❌ Gagal: komunikasi antar VLAN diblokir karena belum ada router.
+
+---
+
+## 💾 Menyimpan Konfigurasi
+
+Pastikan konfigurasi disimpan agar tidak hilang setelah restart.
+
+```bash
+copy running-config startup-config
+```
+
+---
+
+## 🔍 Hasil dan Analisis
+
+* VLAN 10 dan VLAN 30 berhasil dibuat dan terisolasi.
+* Trunk antar switch berjalan dengan native VLAN 1000.
+* Komunikasi dalam VLAN berhasil, antar VLAN gagal (karena tidak ada inter-VLAN routing).
+* VLAN 99 berfungsi sebagai jaringan manajemen.
+
+---
+
+## 🧠 Kesimpulan
+
+Pengembangan topologi ini menambah **switch (S3)** dan **VLAN baru (VLAN 30 - Finance)** untuk memperluas jaringan tanpa mengubah struktur dasar.
+Konfigurasi VLAN dan trunking memungkinkan pemisahan domain broadcast dan efisiensi komunikasi antar switch.
+
+---
