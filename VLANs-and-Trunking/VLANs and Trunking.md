@@ -123,13 +123,16 @@ interface vlan 99
 exit
 ```
 
-> Gunakan IP yang berbeda di setiap switch (lihat tabel IP).
+>*(Lakukan juga di S2 dan S3, sesuaikan IP-nya)*
 
 ---
 
 ### 5️⃣ Konfigurasi Trunk Antar Switch
 
-Gunakan port **FastEthernet0/1** untuk trunk antar switch.
+Gunakan port **FastEthernet0/1** untuk koneksi antar switch.
+**S2** akan memiliki dua trunk karena menghubungkan dua arah (ke S1 dan S3).
+
+#### 🔹 Di **S1**
 
 ```bash
 interface f0/1
@@ -137,9 +140,30 @@ interface f0/1
  switchport trunk native vlan 1000
 ```
 
-Lakukan pada S1 ↔ S2 dan S2 ↔ S3.
+#### 🔹 Di **S2**
+
+```bash
+# Trunk ke S1
+interface f0/1
+ switchport mode trunk
+ switchport trunk native vlan 1000
+
+# Trunk ke S3
+interface f0/2
+ switchport mode trunk
+ switchport trunk native vlan 1000
+```
+
+#### 🔹 Di **S3**
+
+```bash
+interface f0/1
+ switchport mode trunk
+ switchport trunk native vlan 1000
+```
 
 ---
+
 
 ### 6️⃣ Verifikasi VLAN dan Trunk
 
