@@ -75,7 +75,6 @@ PC-B (VLAN 10)
 ```
 
 Jadi, meskipun PC-A dan PC-B ada di switch berbeda, **mereka masih dalam VLAN yang sama** → bisa ping sukses.
-```
 
 Di sinilah **kenapa PC-A dan PC-B bisa ping** walau beda switch:
 karena **trunk mengizinkan VLAN 10 lewat antar-switch**.
